@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-Here is my rough draft for assignment one. I have borrowed Taelor Malcolm's code for the data collection. 
+Here is my first assignment. I have borrowed Taelor Malcolm's code for the data collection. 
 
 Also, this does not need to be graded since I am auditing the course. 
 
@@ -87,8 +87,8 @@ ct_tracts <- get_acs(geography = "tract", variables = vars,
          majority_inc, med_age, majority_race_eth, tot_pop)
 
 data <- ct_tracts %>%
-    mutate(hisp = ifelse(majority_race_eth == "hispanic", "Hispanic-majority", "non-hispanic-majority")) %>% 
-    mutate(age = ifelse(med_age > 40, "40+", "<40"))
+  mutate(hisp = ifelse(majority_race_eth == "hispanic", "Hispanic-majority", "non-hispanic-majority")) %>% 
+  mutate(age = ifelse(med_age > 40, "40+", "<40"))
 
 (plot1 <- ggplot(data, aes(x = pct_rent_occ, y = med_age, color = hisp)) + 
     geom_point() + 
@@ -119,12 +119,28 @@ data <- ct_tracts %>%
     theme(axis.text.y = element_blank()) + 
     labs(caption = "Hartford County, Connecticut; Source: American Community Survey"))
 
-(plot5 <- ggplot(data, aes(med_age)) + 
+(plot5a <- ggplot(data, aes(pct_rent_occ, med_age)) +
+  stat_density2d(aes(fill = ..density..), geom = "raster", contour = FALSE) + 
+  geom_density_2d() + 
+  facet_grid(.~hisp) + 
+  ggtitle("Median age v. rent occupied, %") + 
+  theme_fivethirtyeight() + 
+  labs(caption = "Hartford County, Connecticut; Source: American Community Survey"))
+
+(plot5b <- ggplot(data, aes(pct_rent_occ, med_age)) +
+    stat_density2d(aes(fill = ..density..), geom = "raster", contour = FALSE) + 
+    geom_density_2d() + 
+    facet_grid(age~hisp) + 
+    ggtitle("Median age v. rent occupied, %") + 
+    theme_fivethirtyeight() + 
+    labs(caption = "Hartford County, Connecticut; Source: American Community Survey"))
+
+(plot6 <- ggplot(data, aes(med_age)) + 
     geom_histogram() + 
     facet_grid(.~hisp) + 
     ggtitle("Distribution of tracts by age") + 
     theme_fivethirtyeight() + 
     labs(caption = "Hartford County, Connecticut; Source: American Community Survey"))
-  
+
   
 ```
