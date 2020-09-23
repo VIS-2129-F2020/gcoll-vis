@@ -1,0 +1,142 @@
+---
+title: "Assignment 1"
+author: "Gabriel Coll"
+date: "9/13/2020"
+output: html_document
+---
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Here is my second assignment. I have added links where I adapted code from another source.  
+
+```{r}
+library(tidycensus)
+library(tidyverse)
+library(ggthemes)
+library(scales)
+options(tigris_use_cache = TRUE)
+
+read_ne_corr <-
+  get_acs(
+    state = c(
+      "CT",
+      "MA",
+      "VT",
+      "NH",
+      "ME",
+      "RI",
+      "NY",
+      "PA",
+      "NJ",
+      "MD",
+      "DC",
+      "DE"
+    ),
+    geography = "county",
+    variables = "B19013_001",
+    geometry = TRUE
+  )
+
+# https://www.r-bloggers.com/2018/09/custom-themes-in-ggplot2/
+
+theme_new <- function(base_size = 11,
+                      base_family = "",
+                      base_line_size = base_size / 50,
+                      base_rect_size = base_size / 170) {
+  theme_minimal(
+    base_size = base_size,
+    base_family = base_family,
+    base_line_size = base_line_size
+  ) %+replace%
+    theme(
+      plot.title = element_text(
+        color = rgb(25, 43, 65, maxColorValue = 255),
+        face = "bold",
+        hjust = 0
+      ),
+      axis.title = element_text(
+        color = rgb(105, 105, 105, maxColorValue = 255),
+        size = rel(0.75)
+      ),
+      axis.text = element_text(
+        color = rgb(105, 105, 105, maxColorValue = 255),
+        size = rel(0.5)
+      ),
+      panel.grid.major = element_line(rgb(105, 105, 105, maxColorValue = 255),
+                                      linetype = "dotted"),
+      panel.grid.minor = element_line(
+        rgb(105, 105, 105, maxColorValue = 255),
+        linetype = "dotted",
+        size = rel(4)
+      ),
+      legend.title = element_blank(),
+      
+      complete = TRUE
+    )
+}
+
+# https://walker-data.com/tidycensus/articles/spatial-data.html
+
+ne_corr <- read_ne_corr %>%
+  ggplot(aes(fill = estimate)) +
+  geom_sf(color = NA) +
+  theme_new() +
+  ggtitle("Median Income in the Northeast Corridor States, by County")
+
+# https://cfss.uchicago.edu/notes/vector-maps/
+
+ne_corr +
+  coord_sf(crs = 26911) +
+  labs(caption = "Default census projection") +
+  scale_fill_viridis_c(
+    trans = "sqrt",
+    alpha = .9,
+    labels = scales::label_dollar(),
+    option = "A"
+  )
+
+ne_corr +
+  coord_sf(crs = "+proj=merc") +
+  labs(caption = "Mercator projection") +
+  scale_fill_viridis_c(
+    trans = "sqrt",
+    alpha = .9,
+    labels = scales::label_dollar(),
+    option = "B"
+  )
+
+ne_corr +
+  coord_sf(crs = "+proj=cea +lon_0=0 +lat_ts=45") +
+  labs(caption = "Gall-Peters projection") +
+  scale_fill_viridis_c(
+    trans = "sqrt",
+    alpha = .9,
+    labels = scales::label_dollar(),
+    option = "C"
+  )
+
+ne_corr +
+  coord_sf(crs = "+proj=aea +lat_1=25 +lat_2=50 +lon_0=-100") +
+  labs(caption = "Albers equal-area projection") +
+  scale_fill_viridis_c(
+    trans = "sqrt",
+    alpha = .9,
+    labels = scales::label_dollar(),
+    option = "D"
+  )
+
+ne_corr +
+  coord_sf(crs = "+proj=laea +lat_0=35 +lon_0=-100") +
+  labs(caption = "Lambert azimuthal projection") +
+  scale_fill_viridis_c(
+    trans = "sqrt",
+    alpha = .9,
+    labels = scales::label_dollar(),
+    option = "E"
+  )
+
+```
